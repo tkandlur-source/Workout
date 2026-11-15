@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Workout">
+<meta name="theme-color" content="#0f1115">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Workout</title>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--card2:#1f232c;--line:#2a2f3a;--text:#eef0f4;--muted:#9aa1ad;--acc:#ff7a3d;--acc2:#ffb347;--ok:#3ecf8e;--prop:#6b7280;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg)}
+body{margin:0;color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
+header{padding:calc(20px + env(safe-area-inset-top)) 16px 8px;max-width:720px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:-.3px}
+.sub{color:var(--muted);font-size:13px;margin:0}
+nav{position:sticky;top:0;z-index:5;background:rgba(15,17,21,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:10px 16px;max-width:720px;margin:0 auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;text-align:center;line-height:1.2}
+.tab small{display:block;font-weight:500;font-size:11px;opacity:.8}
+.tab.on{background:var(--acc);border-color:var(--acc);color:#1a0d05}
+main{max-width:720px;margin:0 auto;padding:14px 16px calc(60px + env(safe-area-inset-bottom))}
+.dayhead{display:flex;justify-content:space-between;align-items:flex-end;margin:6px 0 12px}
+.dayhead h2{margin:0;font-size:20px}
+.dayhead p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.prog{font-size:12px;color:var(--muted);text-align:right}
+.bar{height:6px;background:var(--line);border-radius:4px;margin-top:6px;width:110px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);width:0;transition:width .3s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;display:flex;gap:12px;padding:12px;margin-bottom:10px;align-items:center}
+.card.done{opacity:.55}
+.card.warm{border-color:#5a3a22;background:linear-gradient(135deg,#21180f,#181b22)}
+.pic{flex:0 0 132px;height:112px;background:var(--card2);border-radius:12px;overflow:hidden}
+.pic svg{width:100%;height:100%;display:block}
+.info{flex:1;min-width:0}
+.num{font-size:11px;color:var(--acc2);font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.name{font-size:16px;font-weight:700;margin:2px 0 2px}
+.sets{font-size:14px;color:var(--text);font-weight:600}
+.cue{font-size:12.5px;color:var(--muted);margin:4px 0 8px;line-height:1.35}
+.dots{display:flex;gap:6px;flex-wrap:wrap}
+.dot{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);background:transparent;color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;padding:0}
+.dot.on{background:var(--ok);border-color:var(--ok);color:#06210f}
+.timer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tbtn{border:none;border-radius:10px;padding:8px 12px;font-weight:700;font-size:13px;cursor:pointer;background:var(--acc);color:#1a0d05}
+.tval{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;min-width:58px}
+.rest{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+.rest h3{margin:0 0 8px}
+.rest ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.6;font-size:14px}
+.reset{margin-top:14px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:8px 12px;font-size:12px;cursor:pointer}
+.mode{display:flex;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;margin:12px 0 6px}.mode button{flex:1;border:none;background:none;color:var(--muted);font-weight:700;font-size:14px;padding:9px;border-radius:9px;cursor:pointer}.mode button.on{background:var(--text);color:var(--bg)}
+.sect{font-size:12px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--acc2);margin:16px 0 8px}
+.wt{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:10px 0 6px;font-size:14px;font-weight:600}
+.wt input{width:72px;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 8px;font-size:16px;font-weight:700;margin:0 4px}
+.wt span{color:var(--ok);font-size:13px}
+.goal{font-size:12.5px;color:var(--muted);line-height:1.45;background:#1d1a12;border:1px solid #4a3d1c;border-radius:12px;padding:10px 12px;margin:6px 0}
+.goal b{color:var(--acc2)}
+.notes{margin-top:18px;font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}
+@media (max-width:380px){.pic{flex-basis:110px;height:96px}.name{font-size:15px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>80 → 70 kg · Lose Fat &amp; Build Muscle</h1>
+  <p class="sub">Weight-based warm-up circuit before every session · Mon–Sat training · Sunday rest. Tap the circles to tick off sets.</p>
+  <div class="wt"><label>Current weight <input id="wt" type="number" min="30" max="250" step="0.5" inputmode="decimal">kg</label><span>Goal: 70 kg</span></div>
+  <div class="goal"><b>Reality check on 20 days:</b> 10 kg in 20 days isn't achievable as fat loss. Expect roughly 2–3 kg of fat (plus some water weight early on) in 20 days, and 70 kg in about 2.5–3 months at a safe 0.75–1 kg a week. Update your weight here each week and the warm-up numbers adjust automatically.</div>
+  <div class="mode" id="mode"><button data-m="hotel">🏨 Hotel gym</button><button data-m="full">🏋️ Full gym</button></div>
+  <p class="sub" id="modenote"></p>
+</header>
+<nav><div class="tabs" id="tabs"></div></nav>
+<main id="main"></main>
+
+<script>
+/* ---------- Animated figure engine ---------- */
+const S={h:[100,32],s:[100,46],p:[100,86],k:[101,113],f:[100,140],e:[101,66],w:[102,86]};
+const st=o=>Object.assign({},S,o);
+const BENCHBODY={h:[48,100],s:[62,104],p:[102,104],k:[126,110],f:[130,140]};
+const lb=o=>Object.assign({},BENCHBODY,o);
+const INC={p:[104,104],s:[80,70],h:[72,57],k:[130,110],f:[134,140]};
+const inc=o=>Object.assign({},INC,o);
+const FLATBENCH={t:'bench',x1:38,x2:124,y:111};
+const INCBENCH=[{t:'poly',pts:[[96,112],[64,68]],w:6},{t:'poly',pts:[[92,112],[124,112]],w:6},{t:'poly',pts:[[108,112],[108,140]],w:4}];
+const PULLBAR={t:'poly',pts:[[62,-10],[138,-10]],w:4};
+const FRONT={h:[100,32],s:[90,48],s2:[110,48],p:[94,86],p2:[106,86],k:[93,113],k2:[107,113],f:[92,140],f2:[108,140]};
+const fr=o=>Object.assign({},FRONT,o);
+const hang={w:[100,-10],e:[100,10],s:[100,30],h:[107,19],p:[100,70],k:[98,97],f:[92,122]};
+
+const A={
+ bench:{A:lb({e:[63,84],w:[64,64]}),B:lb({e:[76,114],w:[70,96]}),props:[FLATBENCH,{t:'bar',at:'w',r:12}]},
+ flatDb:{A:lb({e:[63,84],w:[64,64]}),B:lb({e:[78,112],w:[74,94]}),props:[FLATBENCH,{t:'db',at:'w'}]},
+ skull:{A:lb({e:[64,84],w:[64,64]}),B:lb({e:[60,84],w:[44,94]}),props:[FLATBENCH,{t:'bar',at:'w',r:8}]},
+ fly:{A:lb({e:[64,84],w:[64,64]}),B:lb({e:[60,106],w:[56,124]}),props:[FLATBENCH,{t:'db',at:'w'}]},
+ incDb:{A:inc({e:[84,50],w:[86,30]}),B:inc({e:[96,82],w:[92,62]}),props:[...INCBENCH,{t:'db',at:'w'}]},
+ incBb:{A:inc({e:[84,50],w:[86,30]}),B:inc({e:[96,82],w:[90,64]}),props:[...INCBENCH,{t:'bar',at:'w',r:12}]},
+ incCurl:{A:{p:[104,104],s:[74,74],h:[64,63],k:[130,110],f:[134,140],e:[74,94],w:[74,114]},
+          B:{p:[104,104],s:[74,74],h:[64,63],k:[130,110],f:[134,140],e:[74,94],w:[90,82]},
+          props:[{t:'poly',pts:[[96,112],[56,74]],w:6},{t:'poly',pts:[[92,112],[124,112]],w:6},{t:'poly',pts:[[108,112],[108,140]],w:4},{t:'db',at:'w'}]},
+ ohp:{A:st({e:[110,62],w:[104,44]}),B:st({e:[101,26],w:[101,6]}),props:[{t:'bar',at:'w',r:12}]},
+ lateral:{front:1,A:fr({e:[86,68],w:[84,88],e2:[114,68],w2:[116,88]}),B:fr({e:[71,52],w:[52,54],e2:[129,52],w2:[148,54]}),props:[{t:'db',at:'w'},{t:'db',at:'w2'}]},
+ pushdown:{A:st({h:[104,32],s:[102,46],e:[104,66],w:[118,56]}),B:st({h:[104,32],s:[102,46],e:[104,66],w:[112,86]}),props:[{t:'cable',from:[128,-24],at:'w'}]},
+ ohTri:{A:st({e:[106,26],w:[90,34]}),B:st({e:[106,26],w:[108,6]}),props:[{t:'db',at:'w'}]},
+ pushup:{A:{f:[36,138],k:[62,129],p:[88,120],s:[140,102],h:[154,98],e:[140,122],w:[140,140]},
+         B:{f:[36,138],k:[62,135],p:[88,132],s:[140,126],h:[155,124],e:[126,124],w:[140,140]},props:[]},
+ deadlift:{A:{f:[100,140],k:[112,114],p:[84,96],s:[114,70],h:[126,62],e:[112,95],w:[110,118]},
+           B:st({h:[101,32],e:[102,66],w:[104,86]}),props:[{t:'bar',at:'w',dy:9,r:12}]},
+ rdl:{A:st({e:[102,66],w:[104,86]}),B:{f:[100,140],k:[104,113],p:[84,88],s:[120,68],h:[132,62],e:[120,88],w:[120,108]},props:[{t:'bar',at:'w',dy:4,r:12}]},
+ pullup:{A:hang,B:{w:[100,-10],e:[86,8],s:[100,-4],h:[106,-18],p:[100,36],k:[98,63],f:[92,88]},props:[PULLBAR]},
+ wpullup:{A:hang,B:{w:[100,-10],e:[86,8],s:[100,-4],h:[106,-18],p:[100,36],k:[98,63],f:[92,88]},props:[PULLBAR,{t:'plate',at:'p',dy:20,r:8}]},
+ legRaise:{A:Object.assign({},hang,{f:[100,124],k:[100,97]}),B:Object.assign({},hang,{k:[126,72],f:[153,72]}),props:[PULLBAR]},
+ bbRow:{A:{f:[100,140],k:[108,114],p:[84,92],s:[124,74],h:[136,68],e:[124,94],w:[124,114]},
+        B:{f:[100,140],k:[108,114],p:[84,92],s:[124,74],h:[136,68],e:[106,80],w:[114,98]},props:[{t:'bar',at:'w',r:12}]},
+ pendlay:{A:{f:[100,140],k:[106,116],p:[82,96],s:[124,92],h:[139,88],e:[124,111],w:[124,128]},
+          B:{f:[100,140],k:[106,116],p:[82,96],s:[124,92],h:[139,88],e:[106,84],w:[112,102]},props:[{t:'bar',at:'w',r:12}]},
+ facePull:{A:st({e:[118,48],w:[138,46]}),B:st({e:[86,40],w:[104,28]}),props:[{t:'cable',from:[190,36],at:'w'}]},
+ bbCurl:{A:st({e:[102,66],w:[104,86]}),B:st({e:[102,66],w:[118,52]}),props:[{t:'bar',at:'w',r:11}]},
+ hammer:{A:st({e:[102,66],w:[104,86]}),B:st({e:[102,66],w:[118,52]}),props:[{t:'db',at:'w',v:1}]},
+ squat:{A:st({e:[88,58],w:[96,44]}),B:{f:[100,140],k:[120,116],p:[94,108],s:[110,72],h:[116,59],e:[98,84],w:[106,70]},props:[{t:'bar',at:'s',dx:-3,dy:-3,r:12}]},
+ fsquat:{A:st({e:[116,52],w:[106,44]}),B:{f:[100,140],k:[120,116],p:[94,108],s:[102,70],h:[105,56],e:[118,76],w:[108,68]},props:[{t:'bar',at:'s',dx:7,dy:-1,r:12}]},
+ legPress:{A:{p:[66,122],s:[46,86],h:[40,72],k:[70,94],f:[90,104],e:[56,104],w:[68,118]},
+           B:{p:[66,122],s:[46,86],h:[40,72],k:[88,106],f:[109,90],e:[56,104],w:[68,118]},
+           props:[{t:'poly',pts:[[58,130],[36,82]],w:6},{t:'poly',pts:[[56,130],[84,130]],w:6},{t:'poly',pts:[[70,130],[70,140]],w:4},{t:'poly',pts:[[84,118],[154,66]],w:3},{t:'sled',at:'f'}]},
+ lunge:{A:st({k2:[99,113],f2:[98,140]}),B:{f:[124,140],k:[124,113],p:[102,106],s:[102,66],h:[103,52],e:[102,86],w:[103,106],k2:[90,130],f2:[66,136]},props:[]},
+ plank:{A:{f:[36,138],k:[62,132],p:[90,124],s:[138,112],h:[152,106],e:[138,138],w:[160,138]},B:{f:[36,138],k:[62,130],p:[90,120],s:[138,112],h:[152,105],e:[138,138],w:[160,138]},props:[],slow:1},
+ pullover:{A:{f:[100,140],k:[104,113],p:[94,86],s:[116,52],h:[124,39],e:[134,40],w:[152,28]},B:{f:[100,140],k:[104,113],p:[94,86],s:[116,52],h:[124,39],e:[114,72],w:[110,92]},props:[{t:'cable',from:[186,-22],at:'w'}]},
+ dips:{A:{w:[100,70],e:[99,50],s:[100,30],h:[103,16],p:[98,70],k:[100,97],f:[80,108]},B:{w:[100,70],e:[84,58],s:[104,54],h:[110,40],p:[96,94],k:[98,120],f:[78,128]},props:[{t:'poly',pts:[[84,70],[118,70]],w:5},{t:'poly',pts:[[116,70],[116,140]],w:4}]},
+ preacher:{A:{p:[92,100],s:[100,62],h:[104,48],k:[118,102],f:[118,140],e:[116,76],w:[132,92]},B:{p:[92,100],s:[100,62],h:[104,48],k:[118,102],f:[118,140],e:[116,76],w:[106,60]},
+           props:[{t:'poly',pts:[[108,66],[130,96]],w:6},{t:'poly',pts:[[78,106],[104,106]],w:6},{t:'poly',pts:[[92,106],[92,140]],w:4},{t:'poly',pts:[[124,96],[124,140]],w:4},{t:'bar',at:'w',r:8}]},
+ bulgarian:{A:{f:[124,140],k:[124,112],p:[104,90],s:[104,50],h:[105,36],e:[104,70],w:[105,90],k2:[90,112],f2:[66,106]},
+            B:{f:[124,140],k:[124,114],p:[100,108],s:[102,68],h:[103,54],e:[102,88],w:[103,108],k2:[90,133],f2:[68,108]},
+            props:[{t:'bench',x1:30,x2:72,y:108},{t:'db',at:'w'}]},
+ legExt:{A:{p:[84,100],s:[88,60],h:[90,46],k:[114,100],f:[118,127],e:[86,80],w:[96,100]},B:{p:[84,100],s:[88,60],h:[90,46],k:[114,100],f:[140,94],e:[86,80],w:[96,100]},
+         props:[{t:'poly',pts:[[70,104],[78,58]],w:6},{t:'poly',pts:[[72,106],[116,106]],w:6},{t:'poly',pts:[[90,106],[90,140]],w:4},{t:'pad',at:'f',dx:3,r:5}]},
+ legCurl:{A:{h:[156,100],s:[140,106],p:[98,106],k:[70,106],f:[43,107],e:[152,120],w:[162,128]},B:{h:[156,100],s:[140,106],p:[98,106],k:[70,106],f:[56,82],e:[152,120],w:[162,128]},
+          props:[{t:'bench',x1:56,x2:150,y:112},{t:'pad',at:'f',dy:3,r:5}]},
+ calf:{A:st({h:[100,24],s:[100,38],p:[100,78],k:[101,105],f:[100,132],t:[112,132],e:[101,58],w:[102,78]}),
+       B:st({h:[100,16],s:[100,30],p:[100,70],k:[101,97],f:[100,122],t:[112,132],e:[101,50],w:[102,70]}),
+       props:[{t:'rect',x:88,y:132,w:30,h:8},{t:'db',at:'w'}]},
+ seatedCalf:{A:{p:[84,100],s:[80,60],h:[82,46],k:[114,100],f:[114,128],t:[126,128],e:[96,80],w:[110,94]},
+             B:{p:[84,100],s:[80,60],h:[82,46],k:[114,92],f:[114,120],t:[126,128],e:[96,76],w:[110,88]},
+             props:[{t:'poly',pts:[[64,106],[100,106]],w:6},{t:'poly',pts:[[80,106],[80,140]],w:4},{t:'rect',x:106,y:128,w:26,h:12},{t:'pad',at:'k',dy:-6,r:6}]},
+ chop:{front:1,A:fr({e:[108,34],w:[126,24],e2:[122,38],w2:[126,24]}),B:fr({e:[80,72],w:[70,96],e2:[96,72],w2:[70,96]}),props:[{t:'cable',from:[184,-18],at:'w'}]},
+ situp:{A:{h:[34,128],s:[48,132],p:[88,134],k:[112,112],f:[134,138],e:[62,124],w:[60,116]},B:{h:[68,84],s:[74,98],p:[88,134],k:[112,112],f:[134,138],e:[86,108],w:[82,96]},props:[{t:'plate',at:'w',r:9,dy:0}]},
+ tread:{loop:1,
+   A:{h:[103,22],s:[101,36],p:[100,76],k:[110,102],f:[116,129],k2:[94,103],f2:[84,129],e:[108,54],w:[116,68],e2:[94,55],w2:[88,72]},
+   B:{h:[103,22],s:[101,36],p:[100,76],k:[94,103],f:[84,129],k2:[110,102],f2:[116,129],e:[94,55],w:[88,72],e2:[108,54],w2:[116,68]},
+   props:[{t:'tread'}]},
+};
+
+const V=(k,props,extra)=>Object.assign({},A[k],{props},extra||{});
+const DB={t:'db',at:'w'}, DBV={t:'db',at:'w',v:1};
+Object.assign(A,{
+ dbOhp:V('ohp',[DB]), dbDead:V('deadlift',[{t:'db',at:'w',dy:5}]), dbRdl:V('rdl',[{t:'db',at:'w',dy:3}]),
+ dbRow:V('bbRow',[DB]), dbCurl:V('bbCurl',[DB]), dbSkull:V('skull',[FLATBENCH,DBV]), dbChop:V('chop',[DB]),
+ dbLunge:V('lunge',[DB]), dbSitup:V('situp',[DB]),
+ benchDip:{A:{w:[78,104],e:[81,84],s:[84,64],h:[88,50],p:[90,100],k:[120,118],f:[148,138]},
+           B:{w:[78,104],e:[66,90],s:[86,84],h:[90,70],p:[90,120],k:[120,124],f:[148,138]},props:[{t:'bench',x1:28,x2:80,y:104}]},
+ oneArmRow:{A:{p:[66,98],s:[116,96],h:[131,90],k:[70,120],f:[72,140],k2:[82,104],f2:[56,106],e2:[118,101],w2:[120,107],e:[116,116],w:[116,134]},
+            B:{p:[66,98],s:[116,96],h:[131,90],k:[70,120],f:[72,140],k2:[82,104],f2:[56,106],e2:[118,101],w2:[120,107],e:[98,90],w:[104,108]},
+            props:[{t:'bench',x1:48,x2:132,y:108},DBV]},
+ revFly:{front:1,A:fr({h:[100,62],s:[90,74],s2:[110,74],p:[94,90],p2:[106,90],e:[88,94],w:[87,112],e2:[112,94],w2:[113,112]}),
+         B:fr({h:[100,62],s:[90,74],s2:[110,74],p:[94,90],p2:[106,90],e:[72,76],w:[52,80],e2:[128,76],w2:[148,80]}),props:[DB,{t:'db',at:'w2'}]},
+ goblet:{A:st({e:[108,64],w:[110,50]}),B:{f:[100,140],k:[120,116],p:[94,108],s:[108,72],h:[112,58],e:[118,90],w:[120,76]},props:[DBV]},
+ stepUp:{A:{p:[92,86],s:[94,46],h:[96,32],k:[114,90],f:[116,112],k2:[92,113],f2:[92,140],e:[94,66],w:[95,86]},
+         B:{p:[116,58],s:[116,18],h:[118,4],k:[116,85],f:[116,112],k2:[112,84],f2:[104,108],e:[116,38],w:[117,58]},
+         props:[{t:'bench',x1:100,x2:160,y:112},DB]},
+ lyingLegRaise:{A:{h:[150,130],s:[136,134],p:[96,134],e:[116,136],w:[96,137],k:[68,134],f:[40,134]},
+                B:{h:[150,130],s:[136,134],p:[96,134],e:[116,136],w:[96,137],k:[96,106],f:[96,78]},props:[]},
+ dbPullover:{A:lb({e:[62,84],w:[62,64]}),B:lb({e:[42,96],w:[24,92]}),props:[FLATBENCH,DBV]},
+ concCurl:{A:{p:[76,100],s:[100,68],h:[110,58],k:[110,102],f:[112,140],e:[106,90],w:[110,112]},
+           B:{p:[76,100],s:[100,68],h:[110,58],k:[110,102],f:[112,140],e:[106,90],w:[98,72]},props:[{t:'bench',x1:48,x2:100,y:106},DBV]},
+ wallSit:{A:{s:[66,62],h:[68,48],p:[66,102],k:[96,102],f:[96,140],e:[80,72],w:[90,80]},B:{s:[66,61],h:[68,47],p:[66,102],k:[96,102],f:[96,140],e:[80,71],w:[90,79]},
+          props:[{t:'poly',pts:[[58,30],[58,140]],w:5}],slow:1},
+ hipThrust:{A:{s:[60,104],h:[48,98],p:[82,126],k:[110,112],f:[120,140],e:[70,114],w:[84,118]},
+            B:{s:[60,104],h:[48,98],p:[86,104],k:[112,108],f:[120,140],e:[72,96],w:[86,98]},props:[{t:'bench',x1:16,x2:58,y:106},DB]},
+ walk:Object.assign({},A.tread),
+ jog:Object.assign({},A.tread,{fast:1}),
+ highKnees:{loop:1,fast:1,
+   A:st({k:[120,88],f:[118,114],k2:[101,113],f2:[100,140],e:[110,64],w:[120,54],e2:[92,66],w2:[86,82]}),
+   B:st({k:[101,113],f:[100,140],k2:[120,88],f2:[118,114],e:[92,66],w:[86,82],e2:[110,64],w2:[120,54]}),props:[]},
+ bwSquat:{A:st({e:[112,56],w:[128,56]}),B:{f:[100,140],k:[120,116],p:[94,108],s:[110,72],h:[116,59],e:[128,74],w:[146,74]},props:[]},
+ wallPush:{A:{f:[80,140],k:[88,113],p:[96,86],s:[112,50],h:[118,37],e:[130,58],w:[148,52]},
+           B:{f:[80,140],k:[90,113],p:[104,84],s:[128,48],h:[136,36],e:[132,68],w:[148,52]},
+           props:[{t:'poly',pts:[[152,-20],[152,140]],w:5}]},
+});
+const WU=[
+ ['Walk','walk',10,'min','Easy pace to get the blood moving.'],
+ ['Jog','jog',10,'min','Light, conversational jog.'],
+ ['High Knees','highKnees',2,'reps','Knees to hip height, pump the arms. Count each knee.'],
+ ['Squats','bwSquat',4,'reps','Bodyweight. Hips back, chest up, thighs to parallel.'],
+ ['Wall Push-Ups','wallPush',4,'reps','Hands on the wall at shoulder height, body straight, chest to the wall.'],
+ ['Jog','jog',10,'min','Back to a steady, light jog.'],
+ ['Walk','walk',10,'min','Bring the pace down, then start lifting.'],
+];
+const DN=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], DFULL=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+function lerpPose(a,b,t){const o={};for(const k in Object.assign({},a,b)){const p=a[k]||b[k],q=b[k]||a[k];o[k]=[p[0]+(q[0]-p[0])*t,p[1]+(q[1]-p[1])*t];}return o;}
+const L=(a,b,w,c,extra='')=>`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${extra}/>`;
+function prop(pr,P,front){
+  const isFront=['bar','db','plate','pad','sled'].includes(pr.t);
+  if(isFront!==front) return '';
+  const pt=pr.at?[P[pr.at][0]+(pr.dx||0),P[pr.at][1]+(pr.dy||0)]:null;
+  const G='#6b7280';
+  switch(pr.t){
+    case 'bench':return `<rect x="${pr.x1}" y="${pr.y}" width="${pr.x2-pr.x1}" height="6" rx="2" fill="${G}"/>`+L([pr.x1+8,pr.y+6],[pr.x1+8,140],4,G)+L([pr.x2-8,pr.y+6],[pr.x2-8,140],4,G);
+    case 'poly':{let s='';for(let i=0;i<pr.pts.length-1;i++)s+=L(pr.pts[i],pr.pts[i+1],pr.w||5,G);return s;}
+    case 'rect':return `<rect x="${pr.x}" y="${pr.y}" width="${pr.w}" height="${pr.h}" rx="2" fill="${G}"/>`;
+    case 'cable':return L(pr.from,pt,1.5,'#9ca3af')+`<circle cx="${pr.from[0]}" cy="${pr.from[1]}" r="5" fill="none" stroke="${G}" stroke-width="3"/>`;
+    case 'bar':return `<circle cx="${pt[0]}" cy="${pt[1]}" r="${pr.r||12}" fill="#2b2f38" stroke="#cbd5e1" stroke-width="2.5"/><circle cx="${pt[0]}" cy="${pt[1]}" r="2.5" fill="#cbd5e1"/>`;
+    case 'db':return pr.v?`<rect x="${pt[0]-4}" y="${pt[1]-8}" width="8" height="16" rx="3" fill="#cbd5e1"/>`:`<rect x="${pt[0]-8}" y="${pt[1]-4}" width="16" height="8" rx="3" fill="#cbd5e1"/>`;
+    case 'plate':return (pr.dy?L(P[pr.at],pt,1.5,'#9ca3af'):'')+`<circle cx="${pt[0]}" cy="${pt[1]}" r="${pr.r||8}" fill="#2b2f38" stroke="#cbd5e1" stroke-width="2.5"/>`;
+    case 'pad':return `<circle cx="${pt[0]}" cy="${pt[1]}" r="${pr.r||5}" fill="#9ca3af"/>`;
+    case 'sled':return L([pt[0]-8,pt[1]-11],[pt[0]+8,pt[1]+11],5,'#cbd5e1');
+    case 'tread':return `<rect x="34" y="130" width="130" height="6" rx="3" fill="${G}"/>`+L([158,130],[166,62],5,G)+L([166,62],[146,58],5,G)+L([60,136],[56,140],4,G)+L([150,136],[154,140],4,G);
+  }
+  return '';
+}
+function drawFig(def,t){
+  const P=lerpPose(def.A,def.B||def.A,t);
+  const C='#ff7a3d',C2='#a8532b';
+  let g=L([0,140],[200,140],1.5,'#2a2f3a');
+  (def.props||[]).forEach(pr=>g+=prop(pr,P,false));
+  const sh2=P.s2||P.s, hp2=P.p2||P.p;
+  if(P.k2) g+=L(hp2,P.k2,7,C2)+L(P.k2,P.f2,7,C2);
+  if(P.e2) g+=L(sh2,P.e2,6,C2)+L(P.e2,P.w2,6,C2);
+  if(def.front){
+    g+=`<polygon points="${P.s} ${P.s2} ${P.p2} ${P.p}" fill="${C}" stroke="${C}" stroke-width="6" stroke-linejoin="round"/>`;
+    const m=[(P.s[0]+P.s2[0])/2,(P.s[1]+P.s2[1])/2]; g+=L(m,P.h,6,C);
+  } else { g+=L(P.s,P.p,11,C)+L(P.s,P.h,6,C); }
+  g+=`<circle cx="${P.h[0].toFixed(1)}" cy="${P.h[1].toFixed(1)}" r="9" fill="${C}"/>`;
+  if(P.k) g+=L(P.p,P.k,8,C)+L(P.k,P.f,7,C);
+  if(P.t) g+=L(P.f,P.t,5,C);
+  if(P.e) g+=L(P.s,P.e,7,C)+L(P.e,P.w,6,C);
+  (def.props||[]).forEach(pr=>g+=prop(pr,P,true));
+  return g;
+}
+
+/* ---------- Plan data ---------- */
+const DAYS=[
+ {title:'Push',focus:'Chest · Shoulders · Triceps',ex:[
+  ['Barbell Bench Press','3 × 8–10',3,'bench','Shoulder blades pinned, feet planted. Lower the bar to mid-chest, press up.'],
+  ['Incline DB Press','2 × 8–10',2,'incDb','Bench around 30°. Press up and slightly in; control the way down.'],
+  ['Overhead Press','3 × 8–10',3,'ohp','Squeeze glutes, brace abs, press straight up and move your head "through" at the top.'],
+  ['DB Lateral Raises','4 × 12–15',4,'lateral','Lead with the elbows to shoulder height. No swinging.'],
+  ['Cable Tricep Pushdown','2 × 10–12',2,'pushdown','Elbows glued to your sides, lock out fully, slow return.'],
+  ['Overhead Tricep Extension','2 × 10–12',2,'ohTri','Elbows point up, lower deep behind the head for a full stretch.'],
+  ['Push-Ups','2 × Failure',2,'pushup','Body in one straight line, chest just above the floor each rep.'],
+ ]},
+ {title:'Pull',focus:'Back · Biceps · Rear Delts',ex:[
+  ['Deadlift','3 × 6–8',3,'deadlift','Bar over mid-foot, flat back, push the floor away and stand tall.'],
+  ['Pull-Ups / Lat Pulldown','3 × 8–10',3,'pullup','Start from a dead hang, drive elbows down, chin over the bar.'],
+  ['Barbell Row','3 × 8–10',3,'bbRow','Hinge to ~45°, pull the bar to your lower ribs, squeeze the back.'],
+  ['Face Pull','3 × 12–15',3,'facePull','Rope at eye level, pull toward your face with elbows high and wide.'],
+  ['Barbell Curl','2 × 10–12',2,'bbCurl','Elbows stay still, no hip swing, squeeze at the top.'],
+  ['Incline DB Curl','3 × 8–10',3,'incCurl','Let the arms hang behind your body for a full biceps stretch.'],
+ ]},
+ {title:'Legs',focus:'Quads · Hamstrings · Core',ex:[
+  ['Back Squat','4 × 8–10',4,'squat','Brace, sit hips back and down to at least parallel, knees track over toes.'],
+  ['Romanian Deadlift','3 × 8–10',3,'rdl','Soft knees, push hips back, slide the bar down your thighs until hamstrings stretch.'],
+  ['Leg Press','3 × 10–15',3,'legPress','Lower back stays on the pad; don’t lock the knees at the top.'],
+  ['Walking Lunges','3 × 10–12/leg',3,'lunge','Long step, back knee close to the floor, drive through the front heel.'],
+  ['Hanging Leg Raises','3 × 12–15',3,'legRaise','No swinging. Curl the pelvis up, lower slowly.'],
+  ['Plank','3 × 45–60 sec',3,'plank','Elbows under shoulders, squeeze glutes, don’t let hips sag.'],
+ ]},
+ {title:'Chest + Back',focus:'Upper Body Focus',ex:[
+  ['Incline Barbell Press','3 × 8–10',3,'incBb','Bench 30°, bar to upper chest, press back up over the shoulders.'],
+  ['Flat DB Press','3 × 8–10',3,'flatDb','Dumbbells to chest level, press up and together.'],
+  ['Weighted Pull-Ups','3 × 6–10',3,'wpullup','Add weight with a belt; full hang to chin over bar.'],
+  ['Pendlay Row','3 × 8–10',3,'pendlay','Torso near parallel, bar starts on the floor every rep. Pull explosively to the chest.'],
+  ['DB Fly','2 × 12–15',2,'fly','Slight elbow bend, open wide to a chest stretch, then hug back up.'],
+  ['Cable Lat Pullover','3 × 10–12',3,'pullover','Arms nearly straight, sweep the bar down to your thighs using the lats.'],
+  ['Dips','2 × Failure',2,'dips','Lean slightly forward, lower until upper arms are parallel, press up.'],
+ ]},
+ {title:'Arms + Shoulders',focus:'Triceps · Biceps · Delts',ex:[
+  ['Cable Tricep Pushdown','3 × 8–12',3,'pushdown','Elbows glued to your sides, lock out fully, slow return.'],
+  ['EZ-Bar Skull Crushers','3 × 10–12',3,'skull','Lower the bar to the forehead, elbows keep pointing up.'],
+  ['Preacher Curl','3 × 10–12',3,'preacher','Armpits on the pad, fully straighten at the bottom.'],
+  ['Incline DB Curl','2 × 8–10',2,'incCurl','Let the arms hang behind your body for a full stretch.'],
+  ['Hammer Curl','2 × 10–12',2,'hammer','Thumbs up (neutral grip), no swinging.'],
+  ['DB Lateral Raises','4 × 12–15',4,'lateral','Lead with the elbows to shoulder height. No swinging.'],
+  ['Face Pulls','3 × 12–15',3,'facePull','Pull toward your face with elbows high and wide.'],
+ ]},
+ {title:'Legs + Core',focus:'Quads · Glutes · Calves · Core',ex:[
+  ['Front Squat','3 × 8–10',3,'fsquat','Elbows high, torso upright, sit straight down.'],
+  ['Bulgarian Split Squat','3 × 10–12/leg',3,'bulgarian','Rear foot on a bench, drop straight down, drive through the front heel.'],
+  ['Leg Extension','3 × 12–15',3,'legExt','Pause and squeeze at the top, lower slowly.'],
+  ['Leg Curl','3 × 10–12',3,'legCurl','Hips pressed into the pad, curl heels toward glutes.'],
+  ['Standing Calf Raise','4 × 12–20',4,'calf','Full stretch at the bottom, pause high on the toes.'],
+  ['Seated Calf Raise','3 × 15–20',3,'seatedCalf','Slow reps with a pause in the stretch.'],
+  ['Cable Woodchopper','3 × 12–15/side',3,'chop','Rotate through the torso with long arms; pivot the back foot.'],
+  ['Weighted Sit-Ups','3 × 12–15',3,'situp','Hold a plate on your chest, curl up, control the way down.'],
+ ]},
+ {title:'Rest',focus:'Rest & Recovery',ex:[]},
+];
+
+const HOTEL=[
+ {title:'Push',focus:'Chest · Shoulders · Triceps',ex:[
+  ['DB Bench Press','3 × 8–12',3,'flatDb','Replaces barbell bench. Lower dumbbells to chest level, press up and together.'],
+  ['Incline DB Press','2 × 8–10',2,'incDb','Set the bench to the second notch (~30°). Control the way down.'],
+  ['DB Shoulder Press','3 × 8–10',3,'dbOhp','Standing or seated upright. Press overhead without arching your back.'],
+  ['DB Lateral Raises','4 × 12–15',4,'lateral','Lead with the elbows to shoulder height. No swinging.'],
+  ['Bench Dips','2 × 12–15',2,'benchDip','Replaces cable pushdown. Hands on bench edge, lower until elbows hit 90°.'],
+  ['Overhead DB Tricep Extension','2 × 10–12',2,'ohTri','Hold one dumbbell with both hands, lower deep behind the head.'],
+  ['Push-Ups','2 × Failure',2,'pushup','Body in one straight line, chest just above the floor each rep.'],
+ ]},
+ {title:'Pull',focus:'Back · Biceps · Rear Delts',ex:[
+  ['DB Deadlift','3 × 8–10',3,'dbDead','Dumbbells at your sides, flat back, push the floor away. Go slow if weights are light.'],
+  ['One-Arm DB Row','3 × 10–12/side',3,'oneArmRow','Replaces pull-ups. Knee and hand on the bench, pull the dumbbell to your hip.'],
+  ['Bent-Over DB Row','3 × 8–10',3,'dbRow','Hinge to ~45°, pull both dumbbells to your lower ribs.'],
+  ['DB Reverse Fly','3 × 12–15',3,'revFly','Replaces face pulls. Bent over, raise arms out wide, squeeze shoulder blades.'],
+  ['DB Curl','2 × 10–12',2,'dbCurl','Elbows still, no swinging, squeeze at the top.'],
+  ['Incline DB Curl','3 × 8–10',3,'incCurl','Let the arms hang behind your body for a full stretch.'],
+ ]},
+ {title:'Legs',focus:'Quads · Hamstrings · Core',ex:[
+  ['Goblet Squat','4 × 10–12',4,'goblet','Replaces back squat. Hold one dumbbell at your chest, sit deep, 3-sec lowering.'],
+  ['DB Romanian Deadlift','3 × 10–12',3,'dbRdl','Soft knees, push hips back until hamstrings stretch.'],
+  ['DB Step-Ups','3 × 10–12/leg',3,'stepUp','Replaces leg press. Step onto the bench, drive through the top heel.'],
+  ['DB Walking Lunges','3 × 10–12/leg',3,'dbLunge','Long step, back knee close to the floor. Lunge in place if space is tight.'],
+  ['Lying Leg Raises','3 × 12–15',3,'lyingLegRaise','Replaces hanging raises. Lower back pressed down, lower legs slowly.'],
+  ['Plank','3 × 45–60 sec',3,'plank','Elbows under shoulders, squeeze glutes, don’t let hips sag.'],
+ ]},
+ {title:'Chest + Back',focus:'Upper Body Focus',ex:[
+  ['Incline DB Press','3 × 8–10',3,'incDb','Bench ~30°, press up and slightly in.'],
+  ['Flat DB Press','3 × 8–10',3,'flatDb','Dumbbells to chest level, press up and together.'],
+  ['One-Arm DB Row','3 × 8–10/side',3,'oneArmRow','Replaces weighted pull-ups. Use the heaviest dumbbell you can control.'],
+  ['Bent-Over DB Row','3 × 8–10',3,'dbRow','Replaces Pendlay row. Pause 1 sec at the top of each rep.'],
+  ['DB Fly','2 × 12–15',2,'fly','Slight elbow bend, open wide to a chest stretch, hug back up.'],
+  ['DB Pullover','3 × 10–12',3,'dbPullover','Replaces cable pullover. Lower one dumbbell behind your head, pull back over chest.'],
+  ['Bench Dips','2 × Failure',2,'benchDip','Replaces dips. Feet further out = harder.'],
+ ]},
+ {title:'Arms + Shoulders',focus:'Triceps · Biceps · Delts',ex:[
+  ['Overhead DB Tricep Extension','3 × 10–12',3,'ohTri','Replaces cable pushdown. Elbows point up, full stretch.'],
+  ['DB Skull Crushers','3 × 10–12',3,'dbSkull','Lie on the bench, lower dumbbells beside your forehead, elbows stay up.'],
+  ['Concentration Curl','3 × 10–12/arm',3,'concCurl','Replaces preacher curl. Elbow braced on inner thigh, slow lowering.'],
+  ['Incline DB Curl','2 × 8–10',2,'incCurl','Let the arms hang behind your body for a full stretch.'],
+  ['Hammer Curl','2 × 10–12',2,'hammer','Thumbs up (neutral grip), no swinging.'],
+  ['DB Lateral Raises','4 × 12–15',4,'lateral','Lead with the elbows to shoulder height.'],
+  ['DB Reverse Fly','3 × 12–15',3,'revFly','Replaces face pulls. Raise arms out wide, squeeze shoulder blades.'],
+ ]},
+ {title:'Legs + Core',focus:'Quads · Glutes · Calves · Core',ex:[
+  ['Goblet Squat (pause)','3 × 10–12',3,'goblet','Replaces front squat. Pause 2 sec at the bottom of each rep.'],
+  ['Bulgarian Split Squat','3 × 10–12/leg',3,'bulgarian','Rear foot on the bench, drop straight down, drive through the front heel.'],
+  ['Wall Sit','3 × 45–60 sec',3,'wallSit','Replaces leg extension. Thighs parallel to floor, back flat on wall.'],
+  ['DB Hip Thrust','3 × 12–15',3,'hipThrust','Replaces leg curl. Upper back on bench, dumbbell on hips, squeeze glutes at top.'],
+  ['Standing Calf Raise','4 × 12–20',4,'calf','Use a step or plate edge. Full stretch, pause at the top.'],
+  ['Single-Leg Calf Raise','3 × 15–20/leg',3,'calf','Replaces seated calf raise. Hold a dumbbell, hold a wall for balance.'],
+  ['DB Woodchopper','3 × 12–15/side',3,'dbChop','Replaces cable version. Swing one dumbbell high-to-low across your body, rotating the torso.'],
+  ['Weighted Sit-Ups','3 × 12–15',3,'dbSitup','Hold a dumbbell on your chest, curl up, control the way down.'],
+ ]},
+ {title:'Rest',focus:'Rest & Recovery',ex:[]},
+];
+/* ---------- State ---------- */
+let store={};
+try{store=JSON.parse(localStorage.getItem('wk7')||'{}')}catch(e){}
+const save=()=>{try{localStorage.setItem('wk7',JSON.stringify(store))}catch(e){}};
+// Open on today's weekday (Mon=0 … Sun=6)
+let day=(new Date().getDay()+6)%7;
+let mode='hotel'; try{mode=localStorage.getItem('wk7mode')||'hotel'}catch(e){}
+const PLAN=()=>mode==='hotel'?HOTEL:DAYS; const K=()=>mode==='hotel'?'h':'';
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;try{localStorage.setItem('wk7mode',mode)}catch(e){};render();});
+const getW=()=>{const v=parseFloat(store.weight);return v>=30&&v<=250?v:80;};
+const wtIn=document.getElementById('wt'); wtIn.value=getW();
+wtIn.onchange=()=>{const v=parseFloat(wtIn.value);if(v>=30&&v<=250){store.weight=v;save();}wtIn.value=getW();render();};
+
+/* ---------- UI ---------- */
+const tabs=document.getElementById('tabs'), main=document.getElementById('main');
+DAYS.forEach((d,i)=>{const b=document.createElement('button');b.className='tab';b.innerHTML=`${DN[i]}<small>${d.title}</small>`;b.onclick=()=>{day=i;render();window.scrollTo({top:0})};tabs.appendChild(b);});
+
+let figs=[];
+function card(n,name,sets,count,anim,cue,key){
+  const done=(store[key]||[]);
+  const all=done.filter(Boolean).length===count;
+  let dots='';for(let i=0;i<count;i++)dots+=`<button class="dot ${done[i]?'on':''}" data-k="${key}" data-i="${i}">${i+1}</button>`;
+  return `<div class="card ${all?'done':''}"><div class="pic"><svg viewBox="0 -32 200 176" data-a="${anim}"></svg></div>
+  <div class="info"><div class="num">${n}</div><div class="name">${name}</div><div class="sets">${sets}</div><div class="cue">${cue}</div><div class="dots">${dots}</div></div></div>`;
+}
+let tm={k:null,left:0,id:null};
+function fmt(s){return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`}
+function render(){
+  [...tabs.children].forEach((b,i)=>b.classList.toggle('on',i===day));
+  const d=PLAN()[day];
+  document.querySelectorAll('#mode button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+  document.getElementById('modenote').textContent=mode==='hotel'?'Hotel version: only needs a treadmill, dumbbells, a bench and a mat.':'Original plan: barbells, cables, machines and a pull-up bar.';
+  if(!d.ex.length){
+    main.innerHTML=`<div class="dayhead"><div><h2>Sunday — Rest &amp; Recovery</h2><p>No training today. Let the muscles rebuild.</p></div></div>
+    <div class="rest"><h3>Recovery checklist</h3><ul>
+    <li>Sleep 7–9 hours</li><li>Optional: easy 20–30 min walk outside (not a workout)</li><li>10 min of light stretching or foam rolling</li>
+    <li>Keep protein high (≈1.6–2 g per kg body weight) and drink plenty of water</li><li>Weigh yourself once a week (same day, morning, after the toilet) and update the weight box</li><li>Plan next week: try to add a little weight or a rep on your main lifts</li></ul></div>
+    <div class="rest" style="margin-top:10px"><h3>Getting from 80 to 70 kg</h3><ul>
+    <li>Fat loss is mostly diet: eat about 400–500 kcal below maintenance every day</li><li>Protein at every meal; fill half the plate with vegetables</li><li>Cut sugary drinks, juice and alcohol first; they're the easiest wins</li><li>Aim for 8–10k steps a day on top of training</li><li>Safe pace is 0.75–1 kg a week, so the full 10 kg takes about 2.5–3 months</li></ul></div>
+    <div class="notes">Progression tip: when you hit the top of a rep range on all sets with good form, increase the weight next session. Fat loss mostly comes from a modest calorie deficit; the lifting keeps (and builds) muscle while you lose fat.</div>`;
+    figs=[];return;
+  }
+  const tot=d.ex.reduce((a,e)=>a+e[2],0)+WU.length;
+  let doneN=d.ex.reduce((a,e,i)=>a+((store[`${K()}d${day}e${i}`]||[]).filter(Boolean).length),0)+WU.reduce((a,s,i)=>a+((store[`${K()}d${day}w${i}`]||[])[0]?1:0),0);
+  let html=`<div class="dayhead"><div><h2>${DFULL[day]} — ${d.title}</h2><p>${d.focus}</p></div>
+  <div class="prog">${doneN}/${tot} done<div class="bar"><i style="width:${Math.round(doneN/tot*100)}%"></i></div></div></div>`;
+  const w=getW();
+  html+=`<div class="sect">Warm-up circuit · based on ${w} kg</div>`;
+  WU.forEach((s,i)=>{const n=Math.round(w/s[2]);const key=`${K()}d${day}w${i}`;const dn=(store[key]||[])[0];const timed=s[3]==='min';
+    const tbit=timed?`<span class="tval" data-tv="${key}">${fmt(tm.k===key?tm.left:n*60)}</span><button class="tbtn" data-tg="${key}" data-s="${n*60}">${tm.k===key&&tm.id?'Pause':'Start'}</button>`:'';
+    html+=`<div class="card warm ${dn?'done':''}"><div class="pic"><svg viewBox="0 -32 200 176" data-a="${s[1]}"></svg></div><div class="info"><div class="num">Warm-up ${i+1} · weight ÷ ${s[2]}</div><div class="name">${s[0]}</div><div class="sets">${n} ${timed?'min':'reps'}</div><div class="cue">${s[4]}</div><div class="timer">${tbit}<button class="dot ${dn?'on':''}" data-k="${key}" data-i="0" title="Mark done">✓</button></div></div></div>`;});
+  html+=`<div class="sect">Strength workout</div>`;
+  d.ex.forEach((e,i)=>html+=card(`Exercise ${i+1}`,e[0],e[1],e[2],e[3],e[4],`${K()}d${day}e${i}`));
+  html+=`<button class="reset" id="rst">Reset ${DFULL[day]} ticks</button>
+  <div class="notes">Rest 60–90 s between sets (2–3 min on deadlifts and squats). Pick weights that leave 1–2 reps in the tank on most sets. If hotel dumbbells feel too light, slow the lowering to 3 seconds and add reps. The warm-up runs about 35 min at 80 kg; walk/jog on a treadmill or outdoors. Figures are simplified illustrations of the movement path.</div>`;
+  main.innerHTML=html;
+  figs=[...main.querySelectorAll('svg[data-a]')].map(el=>({el,def:A[el.dataset.a]}));
+  main.querySelectorAll('.dot').forEach(b=>b.onclick=()=>{const k=b.dataset.k,i=+b.dataset.i;store[k]=store[k]||[];store[k][i]=!store[k][i];save();const y=window.scrollY;render();window.scrollTo(0,y);});
+  document.getElementById('rst').onclick=()=>{Object.keys(store).forEach(k=>{if(k.startsWith(`${K()}d${day}`))delete store[k]});save();render();};
+  main.querySelectorAll('[data-tg]').forEach(b=>b.onclick=()=>{const k=b.dataset.tg;
+    if(tm.k!==k){clearInterval(tm.id);tm={k,left:+b.dataset.s,id:null};}
+    if(tm.id){clearInterval(tm.id);tm.id=null;}
+    else{tm.id=setInterval(()=>{tm.left=Math.max(0,tm.left-1);const v=main.querySelector(`[data-tv="${tm.k}"]`);if(v)v.textContent=fmt(tm.left);if(!tm.left){clearInterval(tm.id);store[tm.k]=[true];save();tm={k:null,left:0,id:null};try{navigator.vibrate&&navigator.vibrate(400)}catch(e){};const y=window.scrollY;render();window.scrollTo(0,y);}},1000);}
+    const y=window.scrollY;render();window.scrollTo(0,y);});
+}
+render();
+
+/* ---------- Animation loop ---------- */
+function frame(ts){
+  for(const f of figs){
+    if(!f.def)continue;
+    const per=f.def.loop?(f.def.fast?560:900):(f.def.slow?3200:2400);
+    let ph=(ts%per)/per, t;
+    if(f.def.loop){t=(1-Math.cos(ph*2*Math.PI))/2;}
+    else{const x=ph<.5?ph*2:2-ph*2; const c=Math.min(1,Math.max(0,(x-.12)/.76)); t=(1-Math.cos(c*Math.PI))/2;}
+    f.el.innerHTML=drawFig(f.def,t);
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+/* ---------- Offline support ---------- */
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+</script>
+</body>
+</html>
